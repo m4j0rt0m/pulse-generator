@@ -10,11 +10,17 @@ The project is structured as follows:
 
 ## Build
 ##### Create, synthesize and assign pins to the project (*default*).
-  make all
+```
+make all
+```
 
 ## FPGA
 ##### Program
-  make fpga
+```
+make fpga
+```
 ##### Control
-  [SW0] -> Speed up
-  [SW1] -> Speed down
+```
+[SW0] -> Speed up
+[SW1] -> Speed down
+```
