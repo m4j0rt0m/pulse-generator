@@ -22,6 +22,7 @@ TESTBENCH_SRC       = $(wildcard $(shell find $(TESTBENCH_DIR) -type f \( -iname
 PRJ_INCLUDES        = $(addprefix -I, $(PRJ_DIRS))
 
 ### FPGA RTL WILDCARDS ###
+FPGA_TOP            = fpga_top
 FPGA_RTL_SRC        = $(wildcard $(shell find $(FPGA_RTL_DIR) -type f \( -iname \*.v -o -iname \*.sv -o -iname \*.vhdl \)))
 FPGA_RTL_DIRS       = $(wildcard $(shell find $(FPGA_RTL_DIR) -type d))
 FPGA_RTL_HEADERS    = $(wildcard $(shell find $(FPGA_RTL_DIR) -type f \( -iname \*.h -o -iname \*.vh -o -iname \*.svh \)))
@@ -29,7 +30,7 @@ FPGA_RTL_INCLUDES   = $(addprefix -I, $(FPGA_RTL_DIRS))
 
 ### PROJECT ###
 PROJECT             = blink_led
-TOP_MODULE          = fpga_top
+TOP_MODULE          = blink_led
 
 ### LINTER ###
 LINT                = verilator
@@ -125,7 +126,7 @@ create-project-tcl: create-sdc
 	@(echo "set_global_assignment -name MIN_CORE_JUNCTION_TEMP $(MIN_CORE_TEMP)" >> $(CREATE_PROJECT_TCL))
 	@(echo "set_global_assignment -name MAX_CORE_JUNCTION_TEMP $(MAX_CORE_TEMP)" >> $(CREATE_PROJECT_TCL))
 	@(echo "set_global_assignment -name FAMILY \"$(DEVICE_FAMILY)\"" >> $(CREATE_PROJECT_TCL))
-	@(echo "set_global_assignment -name TOP_LEVEL_ENTITY $(TOP_MODULE)" >> $(CREATE_PROJECT_TCL))
+	@(echo "set_global_assignment -name TOP_LEVEL_ENTITY $(FPGA_TOP)" >> $(CREATE_PROJECT_TCL))
 	@(echo "set_global_assignment -name DEVICE \"$(DEVICE_PART)\"" >> $(CREATE_PROJECT_TCL))
 	@(echo "set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256" >> $(CREATE_PROJECT_TCL))
 	$(foreach SRC,$(PRJ_SRC),$(call set_source_file_tcl,$(SRC)))
