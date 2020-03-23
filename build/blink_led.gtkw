@@ -1,0 +1,41 @@
+[*]
+[*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
+[*] Mon Mar 23 03:10:57 2020
+[*]
+[dumpfile] "blink_led.vcd"
+[dumpfile_mtime] "Mon Mar 23 02:01:04 2020"
+[dumpfile_size] 588865544
+[savefile] "blink_led.gtkw"
+[timestart] 0
+[size] 2560 1014
+[pos] -1 -1
+*-23.616150 5910000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] blink_led_tb.
+[sst_width] 227
+[signals_width] 300
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@200
+-CLK & RESET
+@28
+blink_led_tb.clk_i
+blink_led_tb.arstn_i
+@200
+-
+-FREQ CTRL
+@28
+blink_led_tb.freq_dwn_i
+blink_led_tb.freq_up_i
+@200
+-
+-LED
+@28
+blink_led_tb.led_o
+@200
+-
+-FREQUENCY
+@24
+blink_led_tb.freq_clk[25:0]
+blink_led_tb.freq_led[25:0]
+[pattern_trace] 1
+[pattern_trace] 0
