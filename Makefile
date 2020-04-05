@@ -72,7 +72,7 @@ CONNECT_USB_BLASTER = $(SCRIPT_DIR)/connect_usb_blaster
 QUARTUS_SH          = quartus_sh
 QUARTUS_PGM         = quartus_pgm
 
-all: lint sim
+all: lint project sim
 
 lint: $(PRJ_SRC)
 	$(LINT) $(LINT_FLAGS) $^
@@ -108,8 +108,13 @@ connect:
 scan:
 	$(QUARTUS_PGM) --auto
 
-flash-fpga:
+sof: $(SOF_FILE) $(PRJ_SRC) $(PRJ_HEADERS) $(FPGA_RTL_SRC) $(FPGA_RTL_HEADERS)
+
+flash-fpga: $(SOF_FILE) $(PRJ_SRC) $(PRJ_HEADERS) $(FPGA_RTL_SRC) $(FPGA_RTL_HEADERS)
 	$(QUARTUS_PGM) -m $(PROGRAM_MODE) -c $(FPGA_CABLE) -o "p;$(SOF_FILE)@1"
+
+$(SOF_FILE): $(PRJ_SRC) $(PRJ_HEADERS) $(FPGA_RTL_SRC) $(FPGA_RTL_HEADERS)
+	$(MAKE) project
 
 create-project: create-project-tcl
 	rm -rf $(FPGA_BUILD_DIR)/$(PROJECT).qpf; \
@@ -150,6 +155,7 @@ clean: del-bak
 	rm -rf ./build/*.tb
 	rm -rf ./build/*.vcd
 	rm -rf ./fpga/build/*
+	rm -rf ./scripts/create_project.tcl
 
 $(OUTPUT_DIR)/$(TOP_MODULE_SIM).tb: $(TESTBENCH_SRC) $(PRJ_SRC) $(PRJ_HEADERS)
 	@(mkdir -p $(OUTPUT_DIR))

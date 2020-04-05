@@ -1,3 +1,5 @@
 build/*.vcd
 build/*.tb
 fpga/build/*
+scripts/*.sdc
+scripts/create_project.tcl

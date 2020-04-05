@@ -2,7 +2,7 @@
   localparam CLK_FREQ   = 50000000;
 
   localparam FREQ_STEPS = 10;
-  localparam MAX_FREQ   = 100;
+  localparam MAX_FREQ   = 50;
   localparam MIN_FREQ   = 1;
   localparam SCALE_DIV  = 10;
 
