@@ -5,8 +5,9 @@ The project is structured as follows:
 
 - rtl: Verilog source code
 - tb: Testbench code
+- fpga: FPGA test verilog source code
 - build: Output files (*gtkwave, vcd, sof, etc.*)
-- script: Tcl scripts used for Quartus synthesis and fitting tasks.
+- scripts: Tcl scripts used for Quartus synthesis and fitting tasks.
 
 ## Build
 ##### Create, synthesize and assign pins to the project (*default*).
