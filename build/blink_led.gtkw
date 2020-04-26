@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
 [*] Mon Mar 23 03:10:57 2020
 [*]
-[dumpfile] "blink_led.vcd"
+[dumpfile] "build/blink_led.vcd"
 [dumpfile_mtime] "Mon Mar 23 02:01:04 2020"
 [dumpfile_size] 588865544
-[savefile] "blink_led.gtkw"
+[savefile] "build/blink_led.gtkw"
 [timestart] 0
 [size] 2560 1014
 [pos] -1 -1
