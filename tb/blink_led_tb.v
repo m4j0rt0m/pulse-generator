@@ -35,7 +35,7 @@ module blink_led_tb ();
 
   /* sim parameters */
   localparam SIM_PULSES       = 2;
-  localparam SIM_CYCLES       = 3;
+  localparam SIM_CYCLES       = 1;
   localparam INT_CYCLES       = 200000000;
 
   /* some widths params */
@@ -181,6 +181,12 @@ module blink_led_tb ();
     for(i=0; i<=FREQ_STEPS; i=i+1) $dumpvars(1, dut.limit_array[i]);
 
     $display("\n  ************************* [ Simulation  START   ] *************************\n");
+    $display("  [INFO] Parameters:");
+    $display("   [-] Clock Frequency   = %d", CLK_FREQ);
+    $display("   [-] Maximum Frequency = %d", MAX_FREQ);
+    $display("   [-] Minimum Frequency = %d", MIN_FREQ);
+    $display("   [-] Frequency Divider = %d", SCALE_DIV);
+    $display("   [-] Frequency Steps   = %d\n", FREQ_STEPS);
     #INT_CYCLES;
     $display("\n  ************************* [ Simulation TIME OUT ] *************************\n");
     $finish;
