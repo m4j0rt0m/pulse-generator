@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root."
+  exit
+fi
+
+echo "Solving usb-blaster dependencies..."
+
+apt-get install libudev1:i386
+ln -sf /lib/x86_64-linux-gnu/libudev.so.1 /lib/x86_64-linux-gnu/libudev.so.0
+
+echo "Done!"
