@@ -3,7 +3,7 @@
  * Module:      Blinking led w/ step control
  * File:        blink_led.v
  * Author:      Abraham J. Ruiz R. (github.com/m4j0rt0m)
- * Release:     1.0 - First version
+ * Release:     1.1 - Added initial step selector parameter, enable and pause control
  *
  * **********************************************************************************************************
  *
@@ -14,6 +14,7 @@
  *  MIN_FREQ    - Minimum frecuency
  *  SCALE_DIV   - Frecuency divider
  *                  e.g. Freq=1Hz with Div=100 => Actual Freq=0.01Hz (One cycle every 100 seconds)
+ *  INIT_STEP   - Initial step selector from the "n" FREQ_STEPS
  *
  * **********************************************************************************************************
  *
@@ -82,13 +83,14 @@ module blink_led
     parameter FREQ_STEPS  = 10,
     parameter MAX_FREQ    = 100,
     parameter MIN_FREQ    = 1,
-    parameter SCALE_DIV   = 10
+    parameter SCALE_DIV   = 10,
+    parameter INIT_STEP   = 0
   )
 (/*AUTOARG*/
    // Outputs
    led_o,
    // Inputs
-   clk_i, arstn_i, freq_up_i, freq_dwn_i
+   clk_i, arstn_i, en_i, pause_i, freq_up_i, freq_dwn_i
    );
 
   /* local parameters */
@@ -96,15 +98,19 @@ module blink_led
   localparam PTR_WIDTH     = $clog2(FREQ_STEPS + 1);
 
   /* clock and reset - port*/
-  input   wire  clk_i;
-  input   wire  arstn_i;
+  input   wire              clk_i;
+  input   wire              arstn_i;
+
+  /* pause and enable control - port */
+  input   wire              en_i;
+  input   wire              pause_i;
 
   /* freq step control - port */
-  input   wire  freq_up_i;
-  input   wire  freq_dwn_i;
+  input   wire              freq_up_i;
+  input   wire              freq_dwn_i;
 
   /* led output */
-  output  reg   led_o;
+  output  reg               led_o;
 
   /* regs n wires declaration */
   reg  [COUNTER_WIDTH-1:0] counter;
@@ -134,7 +140,7 @@ module blink_led
   assign ptr_dwn = (limit_ptr == 0) ? limit_ptr : limit_ptr - {{(PTR_WIDTH-1){1'b0}},1'b1};
 
   /* next counter value */
-  assign nxt_counter = counter + {{(COUNTER_WIDTH-1){1'b0}},1'b1};
+  assign nxt_counter = counter + {{(COUNTER_WIDTH-1){1'b0}},pause_i};
 
   /* freq step control logic */
   always @ (posedge clk_i, negedge arstn_i) begin
@@ -163,9 +169,9 @@ module blink_led
       led_o   <= 1'b0;
     end
     else begin
-      if(nxt_counter >= limit) begin
+      if(~en_i | (nxt_counter >= limit)) begin
         counter <= {COUNTER_WIDTH{1'b0}};
-        led_o   <= ~led_o;
+        led_o   <= en_i ? ~led_o : 1'b0;
       end
       else
         counter <= nxt_counter;

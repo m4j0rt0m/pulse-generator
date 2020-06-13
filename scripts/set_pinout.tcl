@@ -7,12 +7,16 @@ set project_name "[lindex $argv 0]"
 if [catch {project_open $project_name}] {project_new $project_name}
 
 #============================================================
-# CLOCK AND RESET
+# CLOCK, ENABLE AND RESET
 #============================================================
 set_location_assignment PIN_R8 -to clk_i
 set_location_assignment PIN_M1 -to arstn_i
+set_location_assignment PIN_T8 -to en_i
+set_location_assignment PIN_B9 -to pause_i
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk_i
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to arstn_i
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to en_i
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pause_i
 
 #============================================================
 # FREQ STEP CONTROL

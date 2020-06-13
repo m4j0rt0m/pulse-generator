@@ -5,7 +5,7 @@ module fpga_top (/*AUTOARG*/
    // Outputs
    led_o,
    // Inputs
-   clk_i, arstn_i, freq_up_i, freq_dwn_i
+   clk_i, arstn_i, en_i, pause_i, freq_up_i, freq_dwn_i
    );
 
   /* includes */
@@ -17,6 +17,10 @@ module fpga_top (/*AUTOARG*/
   /* clock and reset - port*/
   input   wire  clk_i;
   input   wire  arstn_i;
+
+  /* enable and pause control - port */
+  input   wire  en_i;
+  input   wire  pause_i;
 
   /* freq step control - port */
   input   wire  freq_up_i;
@@ -135,6 +139,10 @@ module fpga_top (/*AUTOARG*/
       /* clock and reset - port*/
       .clk_i      (clk_i),
       .arstn_i    (arstn_i),
+
+      /* enable and pause control - port */
+      .en_i       (en_i),
+      .pause_i    (pause_i),
 
       /* freq step control - port */
       .freq_up_i  (freq_up),
