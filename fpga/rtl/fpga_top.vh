@@ -1,7 +1,7 @@
 
   localparam CLK_FREQ   = 50000000;
 
-  localparam FREQ_STEPS = 10;
+  localparam FREQ_STEPS = 5;
   localparam MAX_FREQ   = 50;
   localparam MIN_FREQ   = 1;
   localparam SCALE_DIV  = 10;
@@ -9,3 +9,4 @@
   localparam NUM_SYNC   = 3;
   localparam DEBOUNCE   = 16;
   localparam BTN_ACTIVE = 0;
+  localparam LED_WIDTH  = 8;

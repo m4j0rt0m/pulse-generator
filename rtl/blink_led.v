@@ -90,7 +90,7 @@ module blink_led
    // Outputs
    led_o,
    // Inputs
-   clk_i, arstn_i, en_i, pause_i, freq_up_i, freq_dwn_i
+   clk_i, arstn_i, en_i, pause_i, mask_i, freq_up_i, freq_dwn_i
    );
 
   /* local parameters */
@@ -101,18 +101,20 @@ module blink_led
   input   wire              clk_i;
   input   wire              arstn_i;
 
-  /* pause and enable control - port */
+  /* operation control - port */
   input   wire              en_i;
   input   wire              pause_i;
+  input   wire              mask_i;
 
   /* freq step control - port */
   input   wire              freq_up_i;
   input   wire              freq_dwn_i;
 
   /* led output */
-  output  reg               led_o;
+  output  wire              led_o;
 
   /* regs n wires declaration */
+  reg                      led_int;
   reg  [COUNTER_WIDTH-1:0] counter;
   wire [COUNTER_WIDTH-1:0] nxt_counter;
   reg  [COUNTER_WIDTH-1:0] limit;
@@ -140,13 +142,13 @@ module blink_led
   assign ptr_dwn = (limit_ptr == 0) ? limit_ptr : limit_ptr - {{(PTR_WIDTH-1){1'b0}},1'b1};
 
   /* next counter value */
-  assign nxt_counter = counter + {{(COUNTER_WIDTH-1){1'b0}},pause_i};
+  assign nxt_counter = counter + {{(COUNTER_WIDTH-1){1'b0}},~pause_i};
 
   /* freq step control logic */
   always @ (posedge clk_i, negedge arstn_i) begin
     if(~arstn_i) begin
-      limit     <= limit_array[0];
-      limit_ptr <= {PTR_WIDTH{1'b0}};
+      limit     <= limit_array[INIT_STEP-1];
+      limit_ptr <= INIT_STEP[PTR_WIDTH-1:0];
     end
     else begin
       if(change) begin //..a single button has been pushed
@@ -166,17 +168,20 @@ module blink_led
   always @ (posedge clk_i, negedge arstn_i) begin
     if(~arstn_i) begin
       counter <= {COUNTER_WIDTH{1'b0}};
-      led_o   <= 1'b0;
+      led_int <= 1'b0;
     end
     else begin
       if(~en_i | (nxt_counter >= limit)) begin
         counter <= {COUNTER_WIDTH{1'b0}};
-        led_o   <= en_i ? ~led_o : 1'b0;
+        led_int <= en_i ? ~led_int : 1'b0;
       end
       else
         counter <= nxt_counter;
     end
   end
+
+  /* output assignment */
+  assign led_o = mask_i & led_int;
 
 endmodule // blink_led
 

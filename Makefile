@@ -31,10 +31,13 @@ FPGA_RTL_INCLUDES   = $(addprefix -I, $(FPGA_RTL_DIRS))
 ### PROJECT ###
 PROJECT             = blink_led
 TOP_MODULE          = blink_led
+RTL_SRC             = $(PRJ_SRC) $(FPGA_RTL_SRC)
+RTL_INCLUDES        = $(PRJ_INCLUDES) $(FPGA_RTL_INCLUDES)
 
 ### LINTER ###
 LINT                = verilator
 LINT_FLAGS          = --lint-only --top-module $(TOP_MODULE) -Wall $(PRJ_INCLUDES)
+LINT_FLAGS_FPGA     = --lint-only --top-module $(FPGA_TOP) -Wall $(RTL_INCLUDES)
 
 ### SIMULATION ###
 TOP_MODULE_SIM      = blink_led
@@ -76,6 +79,9 @@ all: lint project sim
 
 lint: $(PRJ_SRC)
 	$(LINT) $(LINT_FLAGS) $^
+
+lint-fpga: $(RTL_SRC)
+	$(LINT) $(LINT_FLAGS_FPGA) $^
 
 sim: $(OUTPUT_DIR)/$(TOP_MODULE_SIM).tb
 	$(RUN) $(RUN_FLAGS) $<
