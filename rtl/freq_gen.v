@@ -1,9 +1,9 @@
 /* **********************************************************************************************************
  *
- * Module:      Blinking led w/ step control
- * File:        blink_led.v
+ * Module:      Frequency Generator w/ step control
+ * File:        freq_gen.v
  * Author:      Abraham J. Ruiz R. (github.com/m4j0rt0m)
- * Release:     1.1 - Added initial step selector parameter, enable and pause control
+ * Release:     1.2 - Renamed to Frequency Generator
  *
  * **********************************************************************************************************
  *
@@ -18,10 +18,10 @@
  *
  * **********************************************************************************************************
  *
- * Description: The output LED will blink with a frequency set with the module's parameters and controlled
+ * Description: The output will oscillate with a frequency set with the module's parameters and controlled
  *              with the freq step control.
- *              The maximum output frequency of the LED (excluding the physical constraints) is "CLK_FREQ/2".
- *              The minimum output frequency of the LED is "MIN_FREQ / SCALE_DIV".
+ *              The maximum output frequency of the oscillator (excluding the physical constraints) is "CLK_FREQ/2".
+ *              The minimum output frequency of the oscillator is "MIN_FREQ / SCALE_DIV".
  *
  * **********************************************************************************************************
  *
@@ -77,7 +77,7 @@
 
 `default_nettype none
 
-module blink_led
+module freq_gen
 # (
     parameter CLK_FREQ    = 50000000,
     parameter FREQ_STEPS  = 10,
@@ -88,9 +88,10 @@ module blink_led
   )
 (/*AUTOARG*/
    // Outputs
-   led_o,
+   freq_o,
    // Inputs
-   clk_i, arstn_i, en_i, pause_i, mask_i, freq_up_i, freq_dwn_i
+   clk_i, arstn_i, en_i, pause_i, mask_i, set_i, select_i, freq_up_i,
+   freq_dwn_i
    );
 
   /* local parameters */
@@ -98,23 +99,28 @@ module blink_led
   localparam PTR_WIDTH     = $clog2(FREQ_STEPS + 1);
 
   /* clock and reset - port*/
-  input   wire              clk_i;
-  input   wire              arstn_i;
+  input   wire                  clk_i;
+  input   wire                  arstn_i;
 
   /* operation control - port */
-  input   wire              en_i;
-  input   wire              pause_i;
-  input   wire              mask_i;
+  input   wire                  en_i;
+  input   wire                  pause_i;
+  input   wire                  mask_i;
+
+  /* freq setup control - port */
+  input   wire                  set_i;
+  input   wire  [PTR_WIDTH-1:0] select_i;
 
   /* freq step control - port */
-  input   wire              freq_up_i;
-  input   wire              freq_dwn_i;
+  input   wire                  freq_up_i;
+  input   wire                  freq_dwn_i;
 
-  /* led output */
-  output  wire              led_o;
+  /* oscillator output */
+  output  wire                  freq_o;
 
   /* regs n wires declaration */
-  reg                      led_int;
+  wire                     soft_reset;
+  reg                      freq_int;
   reg  [COUNTER_WIDTH-1:0] counter;
   wire [COUNTER_WIDTH-1:0] nxt_counter;
   reg  [COUNTER_WIDTH-1:0] limit;
@@ -134,6 +140,9 @@ module blink_led
     end
   endgenerate
 
+  /* soft reset, the logic must be cleared everytime there is a frequency change or the logic is disabled */
+  assign soft_reset = set_i | ~en_i | change;
+
   /* the "change" wire will set to "1" if there is only one control set to "1" */
   assign change = freq_up_i ^ freq_dwn_i; //..(0 xor 0 = 0) (0 xor 1 = 1) (1 xor 0 = 1) (1 xor 1 = 0)
 
@@ -151,38 +160,54 @@ module blink_led
       limit_ptr <= INIT_STEP[PTR_WIDTH-1:0];
     end
     else begin
-      if(change) begin //..a single button has been pushed
-        if(freq_up_i) begin //..freq_up
-          limit     <= limit_array[ptr_up];
-          limit_ptr <= ptr_up;
+      if(soft_reset) begin
+        if(set_i) begin //..manual frequency setup
+          limit     <= limit_array[select_i];
+          limit_ptr <= select_i;
         end
-        else begin //..freq_down
-          limit     <= limit_array[ptr_dwn];
-          limit_ptr <= ptr_dwn;
+        else if (change) begin //..a single button has been pushed
+          if(freq_up_i) begin //..freq_up
+            limit     <= limit_array[ptr_up];
+            limit_ptr <= ptr_up;
+          end
+          else begin //..freq_down
+            limit     <= limit_array[ptr_dwn];
+            limit_ptr <= ptr_dwn;
+          end
+        end
+        else begin //..disabled logic
+          limit     <= limit_array[INIT_STEP-1];
+          limit_ptr <= INIT_STEP[PTR_WIDTH-1:0];
         end
       end
     end
   end
 
-  /* blink led logic */
+  /* oscillator logic */
   always @ (posedge clk_i, negedge arstn_i) begin
     if(~arstn_i) begin
-      counter <= {COUNTER_WIDTH{1'b0}};
-      led_int <= 1'b0;
+      counter  <= {COUNTER_WIDTH{1'b0}};
+      freq_int <= 1'b0;
     end
     else begin
-      if(~en_i | (nxt_counter >= limit)) begin
-        counter <= {COUNTER_WIDTH{1'b0}};
-        led_int <= en_i ? ~led_int : 1'b0;
+      if(soft_reset) begin
+        counter  <= {COUNTER_WIDTH{1'b0}};
+        freq_int <= en_i ? ~freq_int : 1'b0;
       end
-      else
-        counter <= nxt_counter;
+      else begin
+        if(nxt_counter >= limit) begin
+          counter  <= {COUNTER_WIDTH{1'b0}};
+          freq_int <= en_i ? ~freq_int : 1'b0;
+        end
+        else
+          counter <= nxt_counter;
+      end
     end
   end
 
   /* output assignment */
-  assign led_o = mask_i & led_int;
+  assign freq_o = mask_i & freq_int;
 
-endmodule // blink_led
+endmodule // freq_gen
 
 `default_nettype wire
