@@ -1,40 +1,25 @@
-# Blinking LED test
-This is a simple test for the DE0 Nano FPGA, the project constructs and test the FPGA with a module that blinks an LED. The speed of the blinking can be controlled by the SWs in the DE0 Nano Board. For simplicity, the project has a Makefile in order to handle the Quartus project creation, mapping, fitting, synthesis, and FPGA programming tasks.
+# Pulse Generator Project
+This is a parameterized "*Pulse Generator*" project, it contains three functionality modes (Linear / Exponential / PWM), step up and step down frequency control as well as a manual setup (or selection) of the scaled frequency.
+
+In order to test the functionality of the pulse generator module, an FPGA test is included with a sweep transition effect.
 
 The project is structured as follows:
 
 - rtl: Verilog source code
 - tb: Testbench code
 - fpga: FPGA test verilog source code
-- build: Output files (*gtkwave, vcd, sof, etc.*)
+- fpga/build: FPGA test build files (*.qpf, .sof, etc.*)
+- build: Output files (*.gtkw, .vcd, etc.*)
 - scripts: Tcl scripts used for Quartus synthesis and fitting tasks.
 
-## Build
-##### Create, synthesize and assign pins to the project (*default*).
+## Linting
+##### Lint the rtl code:
 ```
-make all
+make lint
 ```
-
-## Simulation
-The simulation drives the stimulus of the top module, it is in charge of generating the speed_up and speed_dwn events, then it calculates the output frequency depending on the period of every output pulse. The parameters that can be changed for the simulation are:
-
+##### Including the FPGA test rtl code:
 ```
-/* dut parameters */
-CLK_FREQ    : FPGA's clock frequency
-FREQ_STEPS  : Amount of frequency up <-> down steps
-MAX_FREQ    : Maximum output frequency
-MIN_FREQ    : Minimum output frequency
-SCALE_DIV   : Output frequency divider
-
-/* sim parameters */
-SIM_PULSES  : Number of output full cycles before a frequency step change
-SIM_CYCLES  : Amount of minimum <-> maximum frequency steps full sweeps for the whole simulation
-INT_CYCLES  : Maximum amount of cycles for the simulation (timeout)
-```
-
-In order to simulate the RTL and generate the VCD file, run:
-```
-make sim
+make lint-fpga
 ```
 
 ## FPGA
@@ -58,6 +43,28 @@ make connect
 Program FPGA (once you have the SOF file):
 ```
 make flash-fpga
+```
+
+## Simulation
+The simulation drives the stimulus of the top module, it is in charge of generating the simulation events, then it calculates the output frequency depending on the period of every output pulse. The parameters that can be changed for the simulation are:
+
+```
+/* dut parameters */
+CLK_FREQ    : FPGA's clock frequency
+FREQ_STEPS  : Amount of frequency up <-> down steps
+MAX_FREQ    : Maximum output frequency
+MIN_FREQ    : Minimum output frequency
+SCALE_DIV   : Output frequency divider
+
+/* sim parameters */
+SIM_PULSES  : Number of output full cycles before a frequency step change
+SIM_CYCLES  : Amount of minimum <-> maximum frequency steps full sweeps for the whole simulation
+INT_CYCLES  : Maximum amount of cycles for the simulation (timeout)
+```
+
+In order to simulate the RTL and generate the VCD file, run:
+```
+make sim
 ```
 
 ##### Control
